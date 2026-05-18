@@ -1,0 +1,587 @@
+{
+  "users": [
+    {
+      "id": "user_1",
+      "email": "akashtiwari7117@gmail.com",
+      "password": "akashtiwari@123",
+      "name": "Akash Tiwari",
+      "phone": "9607176340",
+      "plan": "premium",
+      "createdAt": "2025-01-01T10:00:00Z"
+    },
+    {
+      "id": "user_2",
+      "email": "test@gmail.com",
+      "password": "test@123",
+      "name": "Test User",
+      "phone": "9000000000",
+      "plan": "basic",
+      "createdAt": "2025-01-02T10:00:00Z"
+    },
+    {
+      "id": "user_3",
+      "email": "user@primeedge.com",
+      "password": "user@123",
+      "name": "Premium User",
+      "phone": "8000000000",
+      "plan": "growth",
+      "createdAt": "2025-01-03T10:00:00Z"
+    },
+    {
+      "id": "user_4",
+      "email": "admin@primeedge.com",
+      "password": "admin@123",
+      "name": "Admin User",
+      "phone": "9100000000",
+      "plan": "premium",
+      "createdAt": "2025-01-04T10:00:00Z"
+    }
+  ],
+  "leads": [
+    {
+      "id": "lead_1",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "9876543210",
+      "requirement": "Looking for investment guidance",
+      "status": "new",
+      "createdAt": "2025-05-08T10:30:00Z"
+    },
+    {
+      "id": "lead_1778490058368",
+      "status": "new",
+      "createdAt": "2026-05-11T09:00:58.368Z",
+      "name": "Test User",
+      "email": "test@example.com",
+      "phone": "1234567890",
+      "requirement": "Testing contact"
+    },
+    {
+      "id": "lead_1778490107876",
+      "status": "new",
+      "createdAt": "2026-05-11T09:01:47.876Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asdfg"
+    },
+    {
+      "id": "lead_1778490125107",
+      "status": "new",
+      "createdAt": "2026-05-11T09:02:05.107Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "poiuhhuioiuh"
+    },
+    {
+      "id": "lead_1778490264832",
+      "status": "new",
+      "createdAt": "2026-05-11T09:04:24.832Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "werty"
+    },
+    {
+      "id": "lead_1778490715568",
+      "status": "new",
+      "createdAt": "2026-05-11T09:11:55.569Z",
+      "name": "Backend Test",
+      "email": "test@example.com",
+      "phone": "1234567890",
+      "requirement": "Verify backend email route."
+    },
+    {
+      "id": "lead_1778491250897",
+      "status": "new",
+      "createdAt": "2026-05-11T09:20:50.898Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asdfg"
+    },
+    {
+      "id": "lead_1778491267239",
+      "status": "new",
+      "createdAt": "2026-05-11T09:21:07.239Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "qwsdfcv"
+    },
+    {
+      "id": "lead_1778491477746",
+      "status": "new",
+      "createdAt": "2026-05-11T09:24:37.746Z",
+      "name": "UI Test",
+      "email": "ui-test@example.com",
+      "phone": "9999999999",
+      "requirement": "UI verification"
+    },
+    {
+      "id": "lead_1778491586694",
+      "status": "new",
+      "createdAt": "2026-05-11T09:26:26.694Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asdfg"
+    },
+    {
+      "id": "lead_1778491593872",
+      "status": "new",
+      "createdAt": "2026-05-11T09:26:33.873Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "qwerfgbn"
+    },
+    {
+      "id": "lead_1778491975447",
+      "status": "new",
+      "createdAt": "2026-05-11T09:32:55.447Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "qwerfghn"
+    },
+    {
+      "id": "lead_1778492048360",
+      "status": "new",
+      "createdAt": "2026-05-11T09:34:08.360Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "qwerfg"
+    },
+    {
+      "id": "lead_1778492287047",
+      "status": "new",
+      "createdAt": "2026-05-11T09:38:07.047Z",
+      "name": "Email Test",
+      "email": "test@example.com",
+      "phone": "1234567890",
+      "requirement": "Testing email after config"
+    },
+    {
+      "id": "lead_1778492318553",
+      "status": "new",
+      "createdAt": "2026-05-11T09:38:38.553Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "dfgb"
+    },
+    {
+      "id": "lead_1778492948969",
+      "status": "new",
+      "createdAt": "2026-05-11T09:49:08.970Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "werfgh"
+    },
+    {
+      "id": "lead_1778492965040",
+      "status": "new",
+      "createdAt": "2026-05-11T09:49:25.040Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asdfcv"
+    },
+    {
+      "id": "lead_1778492980295",
+      "status": "new",
+      "createdAt": "2026-05-11T09:49:40.295Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdcfv"
+    },
+    {
+      "id": "lead_1778493035415",
+      "status": "new",
+      "createdAt": "2026-05-11T09:50:35.415Z",
+      "name": "Akash Suresh",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdfdwedfdewerfgvfdewefgvfdewedrfvfdew"
+    },
+    {
+      "id": "lead_1778493963309",
+      "status": "new",
+      "createdAt": "2026-05-11T10:06:03.309Z",
+      "name": "Akash Tiwari",
+      "email": "akash@example.com",
+      "phone": "09607176340",
+      "requirement": "Testing form"
+    },
+    {
+      "id": "lead_1778493996412",
+      "status": "new",
+      "createdAt": "2026-05-11T10:06:36.412Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdfghnj"
+    },
+    {
+      "id": "lead_1778494005445",
+      "status": "new",
+      "createdAt": "2026-05-11T10:06:45.445Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdfghjk"
+    },
+    {
+      "id": "lead_1778494380156",
+      "status": "new",
+      "createdAt": "2026-05-11T10:13:00.157Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sxdcv"
+    },
+    {
+      "id": "lead_1778654017018",
+      "status": "new",
+      "createdAt": "2026-05-13T06:33:37.018Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asdf"
+    },
+    {
+      "id": "lead_1778654704296",
+      "status": "new",
+      "createdAt": "2026-05-13T06:45:04.296Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdfg"
+    },
+    {
+      "id": "lead_1778654736597",
+      "status": "new",
+      "createdAt": "2026-05-13T06:45:36.597Z",
+      "name": "Akash Tiwari",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "dfghjm"
+    },
+    {
+      "id": "lead_1778659316472",
+      "status": "new",
+      "createdAt": "2026-05-13T08:01:56.472Z",
+      "name": "Akash Tiwari",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asdfg"
+    },
+    {
+      "id": "lead_1778659337963",
+      "status": "new",
+      "createdAt": "2026-05-13T08:02:17.964Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asedrftghjklkjhgfd"
+    },
+    {
+      "id": "lead_1778659399685",
+      "status": "new",
+      "createdAt": "2026-05-13T08:03:19.685Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asdfvgb"
+    },
+    {
+      "id": "lead_1778659440588",
+      "status": "new",
+      "createdAt": "2026-05-13T08:04:00.588Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "wedrf"
+    },
+    {
+      "id": "lead_1778665667493",
+      "status": "new",
+      "createdAt": "2026-05-13T09:47:47.495Z",
+      "name": "Akash Tiwari",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "qwedrfghjkl"
+    },
+    {
+      "id": "lead_1778665919030",
+      "status": "new",
+      "createdAt": "2026-05-13T09:51:59.033Z",
+      "name": "Akash Suresh",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdfg"
+    },
+    {
+      "id": "lead_1778665944697",
+      "status": "new",
+      "createdAt": "2026-05-13T09:52:24.697Z",
+      "name": "sdf",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdfghjkjhgfdsdfghnj"
+    },
+    {
+      "id": "lead_1778666027035",
+      "status": "new",
+      "createdAt": "2026-05-13T09:53:47.035Z",
+      "name": "Akash Tiwari",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "werfgfdsasdf"
+    },
+    {
+      "id": "lead_1778666165258",
+      "status": "new",
+      "createdAt": "2026-05-13T09:56:05.258Z",
+      "name": "Test",
+      "email": "test@test.com",
+      "phone": "1234567890",
+      "requirement": "test"
+    },
+    {
+      "id": "lead_1778666343138",
+      "status": "new",
+      "createdAt": "2026-05-13T09:59:03.138Z",
+      "name": "Test",
+      "email": "test@test.com",
+      "phone": "1234567890",
+      "requirement": "test"
+    },
+    {
+      "id": "lead_1778666452126",
+      "status": "new",
+      "createdAt": "2026-05-13T10:00:52.126Z",
+      "name": "Akash Tiwari",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "asdfgh"
+    },
+    {
+      "id": "lead_1778666522999",
+      "status": "new",
+      "createdAt": "2026-05-13T10:02:02.999Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdfghjhgtrewertyujytrew"
+    },
+    {
+      "id": "lead_1778666587399",
+      "status": "new",
+      "createdAt": "2026-05-13T10:03:07.399Z",
+      "name": "Test",
+      "email": "test@test.com",
+      "phone": "1234567890",
+      "requirement": "test"
+    },
+    {
+      "id": "lead_1778667004779",
+      "status": "new",
+      "createdAt": "2026-05-13T10:10:04.780Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sertyuytrewertyhgfrerthjkm"
+    },
+    {
+      "id": "lead_1778667284269",
+      "status": "new",
+      "createdAt": "2026-05-13T10:14:44.270Z",
+      "name": "Test",
+      "email": "test@test.com",
+      "phone": "1234567890",
+      "requirement": "test"
+    },
+    {
+      "id": "lead_1778668303938",
+      "status": "new",
+      "createdAt": "2026-05-13T10:31:43.939Z",
+      "name": "Test",
+      "email": "test@test.com",
+      "phone": "1234567890",
+      "requirement": "test"
+    },
+    {
+      "id": "lead_1778668589079",
+      "status": "new",
+      "createdAt": "2026-05-13T10:36:29.081Z",
+      "name": "Akash Tiwari",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "qwertgyhgfds"
+    },
+    {
+      "id": "lead_1778668893006",
+      "status": "new",
+      "createdAt": "2026-05-13T10:41:33.006Z",
+      "name": "Akash Tiwari",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "i  want to invest in your compny right now"
+    },
+    {
+      "id": "lead_1778669405364",
+      "status": "new",
+      "createdAt": "2026-05-13T10:50:05.364Z",
+      "name": "Akash  suresh Tiwari",
+      "email": "akash.tiwari.cse@ghrce.raisonoi.net",
+      "phone": "8087921773",
+      "requirement": "hey! i am vikas i want to invest in your secnd paln"
+    },
+    {
+      "id": "lead_1778674548101",
+      "status": "new",
+      "createdAt": "2026-05-13T12:15:48.101Z",
+      "name": "pranav dike",
+      "email": "pranavdike0@gmail.com",
+      "phone": "858589685",
+      "requirement": "hey akash i want to invest in your intraday plan \ncan u please give me some information about your intraday plan"
+    },
+    {
+      "id": "lead_1778734161864",
+      "status": "new",
+      "createdAt": "2026-05-14T04:49:21.864Z",
+      "name": "vikas tiwari",
+      "email": "vikastiwari168@gmail.com",
+      "phone": "8087921773",
+      "requirement": "hey! Akash i am your brother i want to do invest in your plan \ncan u please give me some more information about it"
+    },
+    {
+      "id": "lead_1778756814823",
+      "status": "new",
+      "createdAt": "2026-05-14T11:06:54.823Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "wertyui"
+    },
+    {
+      "id": "lead_1778757213099",
+      "status": "new",
+      "createdAt": "2026-05-14T11:13:33.099Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "wertyuio"
+    },
+    {
+      "id": "lead_1778762884268",
+      "status": "new",
+      "createdAt": "2026-05-14T12:48:04.273Z",
+      "name": "Akash Suresh",
+      "email": "pranavdike0@gmail.com",
+      "phone": "09607176340",
+      "requirement": "rzxdtfcygvuhbiojp-0iuygfdyguiopiutyuioygfyuiohjbiopjhbiuhguihvgu89yghyug"
+    },
+    {
+      "id": "lead_1778762911746",
+      "status": "new",
+      "createdAt": "2026-05-14T12:48:31.746Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "No requirement specified."
+    },
+    {
+      "id": "lead_1778819802045",
+      "status": "new",
+      "createdAt": "2026-05-15T04:36:42.045Z",
+      "name": "vijay sontakke",
+      "email": "vijay@gmail.com",
+      "phone": "8528528526",
+      "requirement": "wertgyhujioiuytrewqwertyhjhgtrertghbgfew3erfgb"
+    },
+    {
+      "id": "lead_1778828754616",
+      "status": "new",
+      "createdAt": "2026-05-15T07:05:54.617Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "No requirement specified."
+    },
+    {
+      "id": "lead_1778829376075",
+      "status": "new",
+      "createdAt": "2026-05-15T07:16:16.076Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "No requirement specified."
+    },
+    {
+      "id": "lead_1778836708167",
+      "status": "new",
+      "createdAt": "2026-05-15T09:18:28.167Z",
+      "name": "pranav dike",
+      "email": "vikastiwari168@gmail.com",
+      "phone": "09607176340",
+      "requirement": "rtyuikl,mnbvfdsa"
+    },
+    {
+      "id": "lead_1778839203284",
+      "status": "new",
+      "createdAt": "2026-05-15T10:00:03.285Z",
+      "name": "vijay sontakke",
+      "email": "vijay@gmail.com",
+      "phone": "8528528528",
+      "requirement": "kjhgfcvghjkijhgfdfghjkl;"
+    },
+    {
+      "id": "lead_1779083298689",
+      "status": "new",
+      "createdAt": "2026-05-18T05:48:18.689Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "sdfvgsdfdsedfvded"
+    },
+    {
+      "id": "lead_1779092882023",
+      "status": "new",
+      "createdAt": "2026-05-18T08:28:02.023Z",
+      "name": "Akash Tiwari",
+      "email": "akashtiwari7117@gmail.com",
+      "phone": "09607176340",
+      "requirement": "wertyuj"
+    }
+  ],
+  "consultations": [
+    {
+      "id": "consultation_1",
+      "userId": "user_1",
+      "type": "free",
+      "status": "scheduled",
+      "date": "2025-05-15T14:00:00Z",
+      "notes": "Initial consultation",
+      "createdAt": "2025-05-08T10:00:00Z"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub_1",
+      "userId": "user_1",
+      "plan": "premium",
+      "amount": 10000,
+      "billingCycle": "monthly",
+      "status": "active",
+      "createdAt": "2025-01-01T10:00:00Z"
+    }
+  ],
+  "contact_submissions": []
+}
