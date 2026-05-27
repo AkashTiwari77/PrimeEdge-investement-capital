@@ -9,7 +9,7 @@ function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authError, setAuthError] = useState("");
 
-  const API_BASE_URL = "http://localhost:4000";
+  const API_BASE_URL = "https://primeedge-investement-capital.onrender.com";
   const ADMIN_PASSWORD = "admin123"; // ⚠️ Change this to a strong password!
 
   const handleLogin = (e) => {
