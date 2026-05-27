@@ -1,6 +1,45 @@
+import { useState } from "react";
 import "./App.css";
 
 function Helppage() {
+  const [myIssuesActive, setMyIssuesActive] = useState(false);
+  const [query, setQuery] = useState("");
+  const [queryStatus, setQueryStatus] = useState("");
+  const [showContactPopup, setShowContactPopup] = useState(false);
+
+  const handleQuerySubmit = async () => {
+    if (!query.trim()) {
+      setQueryStatus("Please type your query first.");
+      return;
+    }
+
+    setQueryStatus("Sending...");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Help Page Visitor",
+          email: "help-query@primeedge.local",
+          phone: "Not provided",
+          requirement: `Help page query: ${query}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Unable to send query");
+      }
+
+      setQuery("");
+      setQueryStatus("Your query has been sent.");
+    } catch (error) {
+      setQueryStatus(error.message || "Something went wrong.");
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -67,14 +106,47 @@ function Helppage() {
                 </button>
                 <button
                   className="btn"
-                  style={{ background: "#334155", color: "#fff" }}
+                  style={{
+                    background: myIssuesActive ? "#c9a84c" : "#334155",
+                    color: myIssuesActive ? "#000" : "#fff",
+                  }}
+                  onClick={() => {
+                    setMyIssuesActive(true);
+                    setQueryStatus("");
+                  }}
                 >
                   My Issues
                 </button>
               </div>
 
-              <input className="search" placeholder="Type your query here..." />
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <input
+                  className="search"
+                  placeholder="Type your query here..."
+                  value={query}
+                  disabled={!myIssuesActive}
+                  onChange={(e) => setQuery(e.target.value)}
+                  style={{
+                    opacity: myIssuesActive ? 1 : 0.55,
+                    cursor: myIssuesActive ? "text" : "not-allowed",
+                    border: myIssuesActive
+                      ? "1px solid #c9a84c"
+                      : "1px solid transparent",
+                  }}
+                />
+                {myIssuesActive && (
+                  <button className="btn" onClick={handleQuerySubmit}>
+                    Send
+                  </button>
+                )}
+              </div>
             </div>
+
+            {queryStatus && (
+              <p style={{ color: "#c9a84c", marginBottom: 20 }}>
+                {queryStatus}
+              </p>
+            )}
 
             <h2 style={{ color: "#fff", marginBottom: 20 }}>
               Tell us how we can help 👋
@@ -138,7 +210,11 @@ function Helppage() {
                 Have Queries? Please get in touch & we will happy to help you
               </p>
 
-              <button className="btn" style={{ marginTop: 15 }}>
+              <button
+                className="btn"
+                style={{ marginTop: 15 }}
+                onClick={() => setShowContactPopup(true)}
+              >
                 Contact Us
               </button>
             </div>
@@ -146,6 +222,62 @@ function Helppage() {
             <div style={{ fontSize: 40 }}>⚙️</div>
           </div>
         </section>
+
+        {showContactPopup && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(2,6,23,0.75)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 20,
+              zIndex: 1000,
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 360,
+                background: "#111827",
+                border: "1px solid rgba(201,168,76,0.35)",
+                borderRadius: 16,
+                padding: 28,
+                textAlign: "center",
+                boxShadow: "0 24px 80px rgba(0,0,0,0.45)",
+              }}
+            >
+              <h3 style={{ color: "#fff", fontSize: 24, marginBottom: 12 }}>
+                Contact Us
+              </h3>
+              <p style={{ color: "#94a3b8", marginBottom: 10 }}>
+                Call us for quick support
+              </p>
+              <a
+                href="tel:+919607176340"
+                style={{
+                  display: "inline-block",
+                  color: "#f0d080",
+                  fontSize: 22,
+                  fontWeight: 700,
+                  marginBottom: 22,
+                  textDecoration: "none",
+                }}
+              >
+                +91 9607176340
+              </a>
+              <br />
+              <button
+                type="button"
+                className="btn"
+                onClick={() => setShowContactPopup(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

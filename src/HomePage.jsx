@@ -10,8 +10,9 @@ import analysis from "./assets/analysis.jpg";
 import portfolio from "./assets/portfolio-management.jpg";
 import risk from "./assets/risk.jpg";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiPhone, FiMail, FiCopy } from "react-icons/fi";
+import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import Navbar from "./components/Navbar.jsx";
 
 const marketCategories = [
@@ -92,6 +93,62 @@ const marketCategories = [
     ],
   },
   {
+    id: "banking",
+    icon: "🏦",
+    label: "Banking",
+    title: "Top Banking Stocks",
+    subtitle: "Major banking names watched for financial-sector momentum.",
+    companies: [
+      { name: "HDFC Bank", share: "14.2%", detail: "Private banking leader" },
+      { name: "ICICI Bank", share: "13.5%", detail: "Retail and corporate banking" },
+      { name: "SBI", share: "12.8%", detail: "Public sector banking" },
+      { name: "Axis Bank", share: "10.6%", detail: "Large private bank" },
+      { name: "Kotak Bank", share: "9.4%", detail: "Private banking and wealth" },
+    ],
+  },
+  {
+    id: "it-sector",
+    icon: "💻",
+    label: "IT Sector",
+    title: "Top IT Stocks",
+    subtitle: "Technology and software service companies with active market interest.",
+    companies: [
+      { name: "TCS", share: "15.5%", detail: "Large-cap IT services" },
+      { name: "Infosys", share: "13.8%", detail: "IT consulting and digital" },
+      { name: "HCL Tech", share: "10.7%", detail: "Enterprise technology services" },
+      { name: "Wipro", share: "8.9%", detail: "IT services and consulting" },
+      { name: "Tech Mahindra", share: "7.4%", detail: "Technology and telecom services" },
+    ],
+  },
+  {
+    id: "auto",
+    icon: "🚗",
+    label: "Auto",
+    title: "Top Auto Stocks",
+    subtitle: "Automobile and mobility companies tracked by market participants.",
+    companies: [
+      { name: "Maruti", share: "13.1%", detail: "Passenger vehicle leader" },
+      { name: "Tata Motors", share: "11.9%", detail: "Auto and EV momentum" },
+      { name: "Mahindra & Mahindra", share: "10.8%", detail: "SUVs, tractors, and mobility" },
+      { name: "Bajaj Auto", share: "9.6%", detail: "Two-wheeler and export strength" },
+      { name: "Eicher Motors", share: "8.2%", detail: "Premium motorcycle segment" },
+    ],
+  },
+  {
+    id: "pharma",
+    icon: "💊",
+    label: "Pharma",
+    title: "Top Pharma Stocks",
+    subtitle: "Healthcare and pharmaceutical companies with live market movement.",
+    companies: [
+      { name: "Sun Pharma", share: "12.6%", detail: "Large pharmaceutical company" },
+      { name: "Dr Reddy's", share: "10.4%", detail: "Generic and specialty pharma" },
+      { name: "Cipla", share: "9.7%", detail: "Healthcare and respiratory focus" },
+      { name: "Divi's Labs", share: "8.6%", detail: "API and pharma ingredients" },
+      { name: "Apollo Hospitals", share: "7.8%", detail: "Healthcare services leader" },
+    ],
+  },
+  {
     id: "bitcoin",
     icon: "₿",
     label: "Bit Coins",
@@ -135,14 +192,23 @@ function HomePage() {
   const apiUrl = (path) => `${API_BASE_URL}${path}`;
 
   const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginStep, setLoginStep] = useState("email");
   const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState("");
   const [activeCategory, setActiveCategory] = useState("delivery");
+  const [marketTickerItems, setMarketTickerItems] = useState([]);
+  const [marketTickerLoading, setMarketTickerLoading] = useState(true);
+  const [marketTickerError, setMarketTickerError] = useState("");
+  const [liveCategoryItems, setLiveCategoryItems] = useState([]);
+  const [liveCategoryLoading, setLiveCategoryLoading] = useState(true);
+  const [liveCategoryError, setLiveCategoryError] = useState("");
   const selectedCategory =
     marketCategories.find((category) => category.id === activeCategory) ||
     marketCategories[0];
+  const selectedCategoryCompanies =
+    liveCategoryItems.length > 0 ? liveCategoryItems : selectedCategory.companies;
 
   const now = new Date();
   const indiaTime = new Date(
@@ -152,6 +218,134 @@ function HomePage() {
   const minutes = indiaTime.getMinutes();
   const currentTime = hours * 60 + minutes;
   const marketOpen = currentTime >= 540 && currentTime <= 930;
+  const fallbackTickerText =
+    "NIFTY 50 - Live data loading...   SENSEX - Live data loading...   BANKNIFTY - Live data loading...";
+  const marketTickerText =
+    marketTickerItems.length > 0
+      ? marketTickerItems
+          .map((item) => {
+            const percent =
+              typeof item.changePercent === "number"
+                ? item.changePercent.toFixed(2)
+                : null;
+            const price =
+              typeof item.price === "number" ? item.price.toFixed(2) : null;
+            const direction = item.changePercent >= 0 ? "▲" : "▼";
+            const percentText = percent ? `${direction} ${percent}%` : "--";
+            const priceText = price ? `₹${price}` : "";
+            return `${item.name} ${priceText} ${percentText}`.trim();
+          })
+          .join("     ")
+      : fallbackTickerText;
+  const loadingTickerItems = [
+    "NIFTY 50",
+    "SENSEX",
+    "BANKNIFTY",
+    "RELIANCE",
+    "TCS",
+    "INFOSYS",
+    "HDFC BANK",
+    "ICICI BANK",
+    "SBI",
+    "TATA MOTORS",
+    "WIPRO",
+    "AXIS BANK",
+  ].map((name) => ({ name, loading: true }));
+  const visibleTickerItems =
+    marketTickerItems.length > 0 ? marketTickerItems : loadingTickerItems;
+  const marketTickerUnavailableItems = [
+    "NIFTY 50",
+    "SENSEX",
+    "BANKNIFTY",
+    "RELIANCE",
+    "TCS",
+    "INFOSYS",
+    "HDFC BANK",
+    "ICICI BANK",
+    "SBI",
+    "TATA MOTORS",
+    "WIPRO",
+    "AXIS BANK",
+  ];
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchMarketTicker = async () => {
+      try {
+        const response = await fetch(apiUrl("/api/market-ticker"));
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Unable to load market data.");
+        }
+
+        if (isMounted) {
+          setMarketTickerItems(data.ticker || []);
+          setMarketTickerError("");
+        }
+      } catch (error) {
+        console.error("Market ticker error:", error);
+        if (isMounted) {
+          setMarketTickerError("Live market data unavailable");
+        }
+      } finally {
+        if (isMounted) {
+          setMarketTickerLoading(false);
+        }
+      }
+    };
+
+    fetchMarketTicker();
+    const intervalId = window.setInterval(fetchMarketTicker, 60000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchLiveCategory = async () => {
+      try {
+        const response = await fetch(
+          apiUrl(`/api/market-category?category=${activeCategory}`),
+        );
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Unable to load category data.");
+        }
+
+        if (isMounted) {
+          setLiveCategoryItems(data.ticker || []);
+          setLiveCategoryError("");
+        }
+      } catch (error) {
+        console.error("Live category error:", error);
+        if (isMounted) {
+          setLiveCategoryError("Live data unavailable");
+        }
+      } finally {
+        if (isMounted) {
+          setLiveCategoryLoading(false);
+        }
+      }
+    };
+
+    setLiveCategoryItems([]);
+    setLiveCategoryLoading(true);
+    setLiveCategoryError("");
+    fetchLiveCategory();
+    const intervalId = window.setInterval(fetchLiveCategory, 1000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
+  }, [activeCategory]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -160,6 +354,7 @@ function HomePage() {
   const resetLogin = () => {
     setLoginEmail("");
     setLoginPassword("");
+    setShowLoginPassword(false);
     setLoginStep("email");
     setLoginError("");
     setLoginLoading(false);
@@ -183,15 +378,18 @@ function HomePage() {
 
   const handleLoginEmailSubmit = (e) => {
     e.preventDefault();
-    if (!loginEmail.trim()) {
+    const normalizedEmail = loginEmail.trim().toLowerCase();
+
+    if (!normalizedEmail) {
       setLoginError("Please enter your email address.");
       return;
     }
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(loginEmail)) {
+    if (!emailPattern.test(normalizedEmail)) {
       setLoginError("Please enter a valid email address.");
       return;
     }
+    setLoginEmail(normalizedEmail);
     setLoginStep("password");
     setLoginError("");
   };
@@ -199,7 +397,17 @@ function HomePage() {
   // ✅ FIX: Use consistent API_BASE_URL here too (was missing before)
   const handleLoginPasswordSubmit = async (e) => {
     e.preventDefault();
-    if (!loginPassword) {
+    const normalizedEmail = loginEmail.trim().toLowerCase();
+    const password = loginPassword.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(normalizedEmail)) {
+      setLoginError("Please enter a valid email address.");
+      setLoginStep("email");
+      return;
+    }
+
+    if (!password) {
       setLoginError("Please enter your password.");
       return;
     }
@@ -211,16 +419,18 @@ function HomePage() {
       const response = await fetch(apiUrl("/api/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+        body: JSON.stringify({ email: normalizedEmail, password }),
       });
 
       const result = await response.json();
       if (!response.ok) {
-        setLoginError(result.error || "Failed to sign in. Please try again.");
+        setLoginError(
+          result.error || "Email or password is incorrect. Please try again.",
+        );
         return;
       }
 
-      setLoggedInUser(result.user);
+      setLoggedInUser(result.user?.name || result.user?.email || normalizedEmail);
       setLoginStep("success");
     } catch (error) {
       console.error("Login error:", error);
@@ -495,13 +705,13 @@ function HomePage() {
                     type="button"
                     onClick={() =>
                       window.open(
-                        "https://account.microsoft.com/account",
+                        "https://mail.google.com/mail/u/0/",
                         "_blank",
                       )
                     }
                     className="flex-1 rounded-xl border border-gray-300 px-4 py-3 hover:bg-gray-100 transition"
                   >
-                    edge
+                    Mail
                   </button>
                   <button
                     type="button"
@@ -557,13 +767,24 @@ function HomePage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Password
                   </label>
-                  <input
-                    type="password"
-                    value={loginPassword}
-                    onChange={handleLoginPasswordChange}
-                    placeholder="Enter your password"
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showLoginPassword ? "text" : "password"}
+                      value={loginPassword}
+                      onChange={handleLoginPasswordChange}
+                      placeholder="Enter your password"
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-20 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowLoginPassword((current) => !current)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-600 hover:text-black"
+                    >
+                      {showLoginPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
                 </div>
                 {loginError && (
                   <p className="mt-3 text-sm text-red-600">{loginError}</p>
@@ -580,6 +801,7 @@ function HomePage() {
                   onClick={() => {
                     setLoginStep("email");
                     setLoginPassword("");
+                    setShowLoginPassword(false);
                     setLoginError("");
                   }}
                   className="mt-3 w-full rounded-xl border border-gray-300 text-gray-700 py-3 font-semibold hover:bg-gray-50 transition"
@@ -619,17 +841,46 @@ function HomePage() {
 
           {/* MIDDLE: MARQUEE */}
           <div className="w-full max-w-[9020px] pt-2 justify-self-center overflow-hidden min-w-0 lg:order-2">
-            <marquee className="text-green-400 font-semibold tracking-wide">
-              NIFTY 50 ▲ +1.24% &nbsp;&nbsp;&nbsp; SENSEX ▲ +0.98%
-              &nbsp;&nbsp;&nbsp; BANKNIFTY ▼ -0.32% &nbsp;&nbsp;&nbsp; RELIANCE
-              ▲ +2.14% &nbsp;&nbsp;&nbsp; TCS ▲ +1.08% &nbsp;&nbsp;&nbsp;
-              INFOSYS ▲ +0.84% &nbsp;&nbsp;&nbsp; HDFC BANK ▼ -0.45%
-              &nbsp;&nbsp;&nbsp; ICICI BANK ▲ +1.67% &nbsp;&nbsp;&nbsp; SBI ▲
-              +0.92% &nbsp;&nbsp;&nbsp; ADANI ENTERPRISES ▲ +3.11%
-              &nbsp;&nbsp;&nbsp; ITC ▲ +0.56% &nbsp;&nbsp;&nbsp; BHARTI AIRTEL ▲
-              +1.29% &nbsp;&nbsp;&nbsp; LT ▲ +0.73% &nbsp;&nbsp;&nbsp; ASIAN
-              PAINTS ▼ -0.28% &nbsp;&nbsp;&nbsp; MARUTI ▲ +1.41%
-              &nbsp;&nbsp;&nbsp; TATA MOTORS ▲ +2.36%
+            <marquee className="font-semibold tracking-wide">
+              {marketTickerError
+                ? marketTickerUnavailableItems.map((name) => (
+                    <span key={name} className="mr-10 text-yellow-300">
+                      {name} - {marketTickerError}
+                    </span>
+                  ))
+                : visibleTickerItems.map((item) => {
+                const hasLiveChange = typeof item.changePercent === "number";
+                const isUp = hasLiveChange && item.changePercent >= 0;
+                const price =
+                  typeof item.price === "number" ? item.price.toFixed(2) : null;
+                const changePercent = hasLiveChange
+                  ? Math.abs(item.changePercent).toFixed(2)
+                  : null;
+
+                return (
+                  <span
+                    key={item.symbol || item.name}
+                    className={
+                      item.loading
+                        ? "mr-10 text-yellow-300"
+                        : !hasLiveChange
+                          ? "mr-10 text-yellow-300"
+                          : isUp
+                          ? "mr-10 text-green-400"
+                          : "mr-10 text-red-400"
+                    }
+                  >
+                    {item.name}{" "}
+                    {item.loading
+                      ? "Live data loading..."
+                      : hasLiveChange
+                        ? `${price ? `Rs ${price}` : ""} ${
+                            isUp ? "UP" : "DOWN"
+                          } ${changePercent}%`
+                        : "Live data unavailable"}
+                  </span>
+                );
+              })}
             </marquee>
           </div>
 
@@ -854,7 +1105,7 @@ function HomePage() {
               <br />
               <button
                 onClick={() => navigate("/freeconsulantent")}
-                className="text-white text-2xl border py-2 bg-gray-500 ml-12 flex justify-center items-center px-4 max-lg:mx-auto"
+                className="text-white text-2xl rounded-xl border py-3 bg-gray-500 ml-12 flex justify-center items-center px-4 max-lg:mx-auto"
               >
                 Free Consultation
               </button>
@@ -1223,52 +1474,98 @@ function HomePage() {
                   <p className="text-2xl font-semibold text-white">
                     {selectedCategory.label}
                   </p>
+                  <p className="mt-1 text-xs text-gray-200">
+                    {liveCategoryLoading
+                      ? "Updating live..."
+                      : liveCategoryError || "Live every second"}
+                  </p>
                 </div>
               </div>
 
               <div className="mt-7 grid gap-3">
-                {selectedCategory.companies.map((company, index) => (
-                  <div
-                    key={company.name}
-                    className="rounded-xl border border-white/10 bg-white/95 p-4 text-[#101827] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-2xl"
-                  >
-                    <div className="grid grid-cols-[42px_1fr_auto] items-center gap-4 max-sm:grid-cols-[34px_1fr]">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1b2d57] text-sm font-bold text-white max-sm:h-8 max-sm:w-8">
-                        {index + 1}
-                      </div>
+                {selectedCategoryCompanies.map((company, index) => {
+                  const hasLiveChange = typeof company.changePercent === "number";
+                  const isUp = hasLiveChange && company.changePercent >= 0;
+                  const price =
+                    typeof company.price === "number"
+                      ? company.price.toFixed(activeCategory === "bitcoin" ? 2 : 2)
+                      : null;
+                  const changePercent = hasLiveChange
+                    ? Math.abs(company.changePercent).toFixed(2)
+                    : null;
+                  const percentWidth = hasLiveChange
+                    ? `${Math.min(Math.max(Math.abs(company.changePercent) * 12, 8), 100)}%`
+                    : company.share || "18%";
 
-                      <div className="min-w-0">
-                        <div className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-start max-sm:gap-1">
-                          <h3 className="truncate text-lg font-bold max-sm:whitespace-normal">
-                            {company.name}
-                          </h3>
-                          <span className="hidden rounded-full bg-[#eef4ff] px-3 py-1 text-sm font-semibold text-[#1b2d57] max-sm:inline-flex">
-                            {company.share}
-                          </span>
+                  return (
+                    <div
+                      key={company.symbol || company.name}
+                      className="rounded-xl border border-white/10 bg-white/95 p-4 text-[#101827] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-2xl"
+                    >
+                      <div className="grid grid-cols-[42px_1fr_auto] items-center gap-4 max-sm:grid-cols-[34px_1fr]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1b2d57] text-sm font-bold text-white max-sm:h-8 max-sm:w-8">
+                          {index + 1}
                         </div>
-                        <p className="mt-1 text-sm text-gray-600">
-                          {company.detail}
-                        </p>
+
+                        <div className="min-w-0">
+                          <div className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-start max-sm:gap-1">
+                            <h3 className="truncate text-lg font-bold max-sm:whitespace-normal">
+                              {company.name}
+                            </h3>
+                            <span
+                              className={`hidden rounded-full px-3 py-1 text-sm font-semibold max-sm:inline-flex ${
+                                hasLiveChange
+                                  ? isUp
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                              }`}
+                            >
+                              {hasLiveChange
+                                ? `${isUp ? "UP" : "DOWN"} ${changePercent}%`
+                                : company.share || "Loading"}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm text-gray-600">
+                            {company.detail}
+                          </p>
+                        </div>
+
+                        <div className="text-right max-sm:hidden">
+                          <p
+                            className={`text-xl font-bold ${
+                              hasLiveChange
+                                ? isUp
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                                : "text-yellow-600"
+                            }`}
+                          >
+                            {hasLiveChange
+                              ? `${isUp ? "UP" : "DOWN"} ${changePercent}%`
+                              : company.share || "Loading"}
+                          </p>
+                          <p className="text-xs uppercase tracking-wide text-gray-500">
+                            {price ? `Rs ${price}` : hasLiveChange ? "Live" : "Waiting"}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="text-right max-sm:hidden">
-                        <p className="text-xl font-bold text-[#1b2d57]">
-                          {company.share}
-                        </p>
-                        <p className="text-xs uppercase tracking-wide text-gray-500">
-                          Share
-                        </p>
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-200">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            hasLiveChange
+                              ? isUp
+                                ? "bg-gradient-to-r from-green-400 to-green-600"
+                                : "bg-gradient-to-r from-red-400 to-red-600"
+                              : "bg-gradient-to-r from-yellow-300 to-yellow-500"
+                          }`}
+                          style={{ width: percentWidth }}
+                        />
                       </div>
                     </div>
-
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-200">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-[#f4b942] to-[#35c48b] transition-all duration-500"
-                        style={{ width: company.share }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -1329,7 +1626,7 @@ function HomePage() {
                   customer support, we make your investment journey seamless.
                 </p>
               </details>
-              <div className="ml-[940px] mr-40 absolute inset-20 mt-[5110px] max-lg:static max-lg:m-0 max-lg:px-4 max-lg:pb-10">
+              <div className="ml-[940px] mr-40 absolute inset-20 mt-[5140px] max-lg:static max-lg:m-0 max-lg:px-4 max-lg:pb-10">
                 <h1 className="text-white text-5xl max-lg:text-3xl">
                   Leading a Top Investment
                 </h1>
@@ -1552,7 +1849,7 @@ function HomePage() {
           </div>
         </div>
 
-        <footer className="bg-[#3f4a5a] mt-16 text-gray-300 py-12 px-20 max-lg:px-6">
+        <footer className="bg-[#3f4a5a] mt-16 flex flex-col text-gray-300 py-12 px-20 max-lg:px-6">
           <div className="grid grid-cols-4 gap-10 max-lg:grid-cols-1">
             <div>
               <h2 className="text-white text-xl font-semibold mb-2">
@@ -1604,7 +1901,7 @@ function HomePage() {
                 <li>
                   <Link
                     to="/freeconsulantent"
-                    className="text-gray-300 hover:text-white"
+                    className="text-gray-300  hover:text-white"
                   >
                     Free Consultation
                   </Link>
@@ -1659,8 +1956,46 @@ function HomePage() {
               </ul>
             </div>
           </div>
-          <div className="text-center text-sm text-gray-400 mt-10 border-t border-gray-600 pt-4">
+          <div className="order-2 text-center text-sm text-gray-400 mt-4 border-t border-gray-600 pt-4">
             Copyright © 2025 PrimeEdge capital Solutions. All Rights Reserved
+          </div>
+          <div className="order-1 flex justify-end gap-4 mt-10">
+            <a
+              href="https://www.instagram.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Instagram"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-pink-400 text-pink-400 transition-colors hover:bg-pink-400 hover:text-white"
+            >
+              <FaInstagram className="text-xl" />
+            </a>
+            <a
+              href="https://www.facebook.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Facebook"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-500 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
+            >
+              <FaFacebookF className="text-lg" />
+            </a>
+            <a
+              href="https://www.youtube.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="YouTube"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-red-500 text-red-500 transition-colors hover:bg-red-500 hover:text-white"
+            >
+              <FaYoutube className="text-xl" />
+            </a>
+            <a
+              href="https://x.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Twitter"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-400 text-sky-400 transition-colors hover:bg-sky-400 hover:text-white"
+            >
+              <FaTwitter className="text-lg" />
+            </a>
           </div>
         </footer>
       </div>

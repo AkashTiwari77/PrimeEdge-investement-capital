@@ -1,6 +1,76 @@
+import { useState } from "react";
 import "./App.css";
 
 function ContactUs() {
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+    agreed: false,
+  });
+  const [status, setStatus] = useState("");
+
+  const handleContactChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setContactForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!contactForm.agreed) {
+      alert("Please agree to all terms & conditions before submitting.");
+      setStatus("Please agree to all terms and conditions.");
+      return;
+    }
+
+    if (
+      !contactForm.name.trim() ||
+      !contactForm.email.trim() ||
+      !contactForm.subject.trim() ||
+      !contactForm.message.trim()
+    ) {
+      setStatus("Please fill all fields.");
+      return;
+    }
+
+    setStatus("Sending...");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: contactForm.name,
+          email: contactForm.email,
+          phone: "Not provided",
+          requirement: `Contact Us page message. Subject: ${contactForm.subject}. Message: ${contactForm.message}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Unable to send message");
+      }
+
+      setContactForm({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+        agreed: false,
+      });
+      setStatus("Message sent successfully. We will contact you soon.");
+    } catch (error) {
+      setStatus(error.message || "Something went wrong.");
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -86,6 +156,7 @@ function ContactUs() {
           border-radius: 6px;
           border: 1px solid #ccc;
           outline: none;
+          color: #111827;
         }
 
         .form-box input:focus,
@@ -157,14 +228,66 @@ function ContactUs() {
         <div className="ml-44">
           <div className="form-section ">
             <div className="form-wrapper">
-              <div className="form-box">
-                <input placeholder="Name" />
-                <input placeholder="Email" />
-                <input placeholder="Subject" />
-                <textarea rows="5" placeholder="Message"></textarea>
+              <form className="form-box" onSubmit={handleContactSubmit}>
+                <input
+                  name="name"
+                  value={contactForm.name}
+                  onChange={handleContactChange}
+                  placeholder="Name"
+                />
+                <input
+                  name="email"
+                  type="email"
+                  value={contactForm.email}
+                  onChange={handleContactChange}
+                  placeholder="Email"
+                />
+                <input
+                  name="subject"
+                  value={contactForm.subject}
+                  onChange={handleContactChange}
+                  placeholder="Subject"
+                />
+                <textarea
+                  name="message"
+                  value={contactForm.message}
+                  onChange={handleContactChange}
+                  rows="5"
+                  placeholder="Message"
+                ></textarea>
 
-                <button className="btn">Send Message</button>
-              </div>
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    color: "#ddd",
+                    fontSize: 13,
+                    marginBottom: 15,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    name="agreed"
+                    checked={contactForm.agreed}
+                    onChange={handleContactChange}
+                    style={{
+                      width: "auto",
+                      margin: 0,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span>I agree to all terms & conditions.</span>
+                </label>
+
+                <button className="btn" type="submit">
+                  Send Message
+                </button>
+
+                {status && (
+                  <p style={{ color: "#f5c542", marginTop: 12 }}>{status}</p>
+                )}
+              </form>
 
               <div className="map"></div>
             </div>

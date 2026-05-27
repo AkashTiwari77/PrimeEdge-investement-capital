@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
+  const location = useLocation();
   const navItems = [
     { label: "Home", to: "/" },
     { label: "About Us", to: "/about" },
@@ -23,7 +24,11 @@ export default function Navbar() {
             <li key={item.to}>
               <Link
                 to={item.to}
-                className="block cursor-pointer rounded border border-transparent px-3 py-1 text-black transition-all duration-300 hover:border-black hover:bg-gray-400 hover:shadow-[2px_2px_0px_black] lg:px-6"
+                className={`block cursor-pointer rounded border px-3 py-1 text-black transition-all duration-300 hover:border-black hover:bg-gray-400 hover:shadow-[2px_2px_0px_black] lg:px-6 ${
+                  location.pathname === item.to
+                    ? "border-black bg-gray-500 shadow-[2px_2px_0px_black]"
+                    : "border-transparent"
+                }`}
               >
                 {item.label}
               </Link>

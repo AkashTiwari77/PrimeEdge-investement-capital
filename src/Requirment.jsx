@@ -1,6 +1,49 @@
+import { useState } from "react";
 import "./App.css";
 
 function Requirement() {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    city: "",
+  });
+  const [status, setStatus] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("Sending requirement...");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          requirement: `Requirement submitted from Requirement page. City: ${formData.city}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Unable to submit requirement");
+      }
+
+      setFormData({ name: "", phone: "", email: "", city: "" });
+      setStatus("Requirement submitted successfully. We will contact you soon.");
+    } catch (error) {
+      setStatus(error.message || "Something went wrong.");
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -80,7 +123,7 @@ function Requirement() {
         {/* FORM */}
         <section style={{ padding: "60px 30px" }}>
           <div style={{ maxWidth: 900, margin: "auto" }}>
-            <div className="card">
+            <form className="card" onSubmit={handleSubmit}>
               <h2 style={{ color: "#fff", marginBottom: 10 }}>
                 Personal Information
               </h2>
@@ -96,29 +139,62 @@ function Requirement() {
               >
                 <div>
                   <label style={{ color: "#94a3b8" }}>Full Name</label>
-                  <input className="input" placeholder="Enter name" />
+                  <input
+                    className="input"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Enter name"
+                    required
+                  />
                 </div>
 
                 <div>
                   <label style={{ color: "#94a3b8" }}>Phone</label>
-                  <input className="input" placeholder="Enter phone" />
+                  <input
+                    className="input"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Enter phone"
+                    required
+                  />
                 </div>
 
                 <div>
                   <label style={{ color: "#94a3b8" }}>Email</label>
-                  <input className="input" placeholder="Enter email" />
+                  <input
+                    className="input"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter email"
+                    required
+                  />
                 </div>
 
                 <div>
                   <label style={{ color: "#94a3b8" }}>City</label>
-                  <input className="input" placeholder="Enter city" />
+                  <input
+                    className="input"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="Enter city"
+                    required
+                  />
                 </div>
               </div>
 
-              <button className="btn" style={{ marginTop: 20 }}>
+              <button type="submit" className="btn" style={{ marginTop: 20 }}>
                 Submit Requirement
               </button>
-            </div>
+
+              {status && (
+                <p style={{ color: "#f0d080", marginTop: 14 }}>{status}</p>
+              )}
+            </form>
           </div>
         </section>
 

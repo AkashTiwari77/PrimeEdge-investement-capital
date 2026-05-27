@@ -1,6 +1,64 @@
+import { useState } from "react";
 import "./App.css";
 
 function AskExpert() {
+  const [advisorForm, setAdvisorForm] = useState({
+    name: "",
+    phone: "",
+    agreed: false,
+  });
+  const [status, setStatus] = useState("");
+
+  const handleAdvisorChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setAdvisorForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleAdvisorSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!advisorForm.name.trim() || !advisorForm.phone.trim()) {
+      setStatus("Please enter your name and number.");
+      return;
+    }
+
+    if (!advisorForm.agreed) {
+      alert("Please agree to all terms & conditions before submitting.");
+      setStatus("Please agree to all terms and conditions.");
+      return;
+    }
+
+    setStatus("Sending...");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: advisorForm.name,
+          email: "advisor-request@primeedge.local",
+          phone: advisorForm.phone,
+          requirement:
+            "Find an Advisor form submitted from Ask An Expert page. User agreed to terms and conditions.",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Unable to submit request");
+      }
+
+      setAdvisorForm({ name: "", phone: "", agreed: false });
+      setStatus("Request submitted successfully. We will contact you soon.");
+    } catch (error) {
+      setStatus(error.message || "Something went wrong.");
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -198,19 +256,43 @@ function AskExpert() {
         {/* FIND ADVISOR */}
         <div className="form-section">
           <div className="form-wrapper">
-            <div className="form-box">
+            <form className="form-box" onSubmit={handleAdvisorSubmit}>
               <h2>Find an Advisor</h2>
               <p>Our advisors are always ready to help you</p>
 
-              <input className="input" placeholder="Your Name*" />
-              <input className="input" placeholder="Your Number*" />
+              <input
+                className="input"
+                name="name"
+                value={advisorForm.name}
+                onChange={handleAdvisorChange}
+                placeholder="Your Name*"
+              />
+              <input
+                className="input"
+                name="phone"
+                value={advisorForm.phone}
+                onChange={handleAdvisorChange}
+                placeholder="Your Number*"
+              />
 
               <div className="checkbox">
-                <input type="checkbox" /> I agree to all terms & conditions.
+                <input
+                  type="checkbox"
+                  name="agreed"
+                  checked={advisorForm.agreed}
+                  onChange={handleAdvisorChange}
+                />{" "}
+                I agree to all terms & conditions.
               </div>
 
-              <button className="btn">Submit</button>
-            </div>
+              <button className="btn" type="submit">
+                Submit
+              </button>
+
+              {status && (
+                <p style={{ color: "#f5c542", marginTop: 12 }}>{status}</p>
+              )}
+            </form>
 
             <div className="side-img"></div>
           </div>

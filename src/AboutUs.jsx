@@ -1,6 +1,48 @@
+import { useState } from "react";
 import "./App.css";
 
 function AboutUs() {
+  const [showConsultationPopup, setShowConsultationPopup] = useState(false);
+  const [showContactPopup, setShowContactPopup] = useState(false);
+  const [consultationForm, setConsultationForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [consultationStatus, setConsultationStatus] = useState("");
+
+  const handleConsultationChange = (e) => {
+    const { name, value } = e.target;
+    setConsultationForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleConsultationSubmit = async (e) => {
+    e.preventDefault();
+    setConsultationStatus("Sending...");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...consultationForm,
+          requirement: "Wants to book a free seminar from About Us page",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Unable to send request");
+      }
+
+      setConsultationStatus("Request sent. We will contact you soon.");
+      setConsultationForm({ name: "", email: "", phone: "" });
+    } catch (error) {
+      setConsultationStatus(error.message || "Something went wrong.");
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -542,6 +584,10 @@ function AboutUs() {
                   onMouseLeave={(e) =>
                     (e.currentTarget.style.transform = "scale(1)")
                   }
+                  onClick={() => {
+                    setConsultationStatus("");
+                    setShowConsultationPopup(true);
+                  }}
                 >
                   Free Consultation
                 </button>
@@ -566,6 +612,7 @@ function AboutUs() {
                       "rgba(255,255,255,0.25)";
                     e.currentTarget.style.color = "#fff";
                   }}
+                  onClick={() => setShowContactPopup(true)}
                 >
                   Contact Us
                 </button>
@@ -573,6 +620,177 @@ function AboutUs() {
             </div>
           </div>
         </section>
+
+        {showConsultationPopup && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(2,6,23,0.75)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 20,
+              zIndex: 1000,
+            }}
+          >
+            <form
+              onSubmit={handleConsultationSubmit}
+              style={{
+                width: "100%",
+                maxWidth: 420,
+                background: "#111827",
+                border: "1px solid rgba(201,168,76,0.35)",
+                borderRadius: 16,
+                padding: 28,
+                boxShadow: "0 24px 80px rgba(0,0,0,0.45)",
+              }}
+            >
+              <h3
+                style={{
+                  color: "#fff",
+                  fontSize: 24,
+                  fontWeight: 700,
+                  marginBottom: 8,
+                }}
+              >
+                Free Seminar Booking
+              </h3>
+              <p style={{ color: "#94a3b8", fontSize: 14, marginBottom: 20 }}>
+                Enter your details and we will send a booking alert to our team.
+              </p>
+
+              {["name", "email", "phone"].map((field) => (
+                <input
+                  key={field}
+                  name={field}
+                  type={field === "email" ? "email" : "text"}
+                  value={consultationForm[field]}
+                  onChange={handleConsultationChange}
+                  placeholder={
+                    field === "name"
+                      ? "Your Name"
+                      : field === "email"
+                        ? "Your Email"
+                        : "Your Phone"
+                  }
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    marginBottom: 12,
+                    borderRadius: 10,
+                    border: "1px solid rgba(255,255,255,0.18)",
+                    background: "#0f172a",
+                    color: "#fff",
+                    outline: "none",
+                  }}
+                />
+              ))}
+
+              {consultationStatus && (
+                <p style={{ color: "#f0d080", fontSize: 13, marginBottom: 14 }}>
+                  {consultationStatus}
+                </p>
+              )}
+
+              <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowConsultationPopup(false)}
+                  style={{
+                    padding: "11px 18px",
+                    borderRadius: 10,
+                    border: "1px solid rgba(255,255,255,0.22)",
+                    background: "transparent",
+                    color: "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "11px 18px",
+                    borderRadius: 10,
+                    border: "none",
+                    background: "linear-gradient(90deg,#c9a84c,#f0d080)",
+                    color: "#000",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Send Alert
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {showContactPopup && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(2,6,23,0.75)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 20,
+              zIndex: 1000,
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 360,
+                background: "#111827",
+                border: "1px solid rgba(201,168,76,0.35)",
+                borderRadius: 16,
+                padding: 28,
+                textAlign: "center",
+                boxShadow: "0 24px 80px rgba(0,0,0,0.45)",
+              }}
+            >
+              <h3 style={{ color: "#fff", fontSize: 24, marginBottom: 12 }}>
+                Contact Us
+              </h3>
+              <p style={{ color: "#94a3b8", marginBottom: 10 }}>
+                Call us for quick support
+              </p>
+              <a
+                href="tel:+919607176340"
+                style={{
+                  display: "inline-block",
+                  color: "#f0d080",
+                  fontSize: 22,
+                  fontWeight: 700,
+                  marginBottom: 22,
+                  textDecoration: "none",
+                }}
+              >
+                +91 9607176340
+              </a>
+              <br />
+              <button
+                type="button"
+                onClick={() => setShowContactPopup(false)}
+                style={{
+                  padding: "11px 22px",
+                  borderRadius: 10,
+                  border: "none",
+                  background: "linear-gradient(90deg,#c9a84c,#f0d080)",
+                  color: "#000",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

@@ -111,18 +111,25 @@ export const routes = {
 
     try {
       const { email, password } = await parseRequestBody(req);
+      const normalizedEmail = String(email || "").trim().toLowerCase();
+      const normalizedPassword = String(password || "").trim();
 
-      if (!email || !password) {
+      if (!normalizedEmail || !normalizedPassword) {
         return sendJson(res, 400, { success: false, error: "Email and password required" }, origin);
       }
 
-      const user = db.findUserByEmail(email);
-      if (!user) {
-        return sendJson(res, 401, { success: false, error: "User not found" }, origin);
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(normalizedEmail)) {
+        return sendJson(res, 400, { success: false, error: "Please enter a valid email address." }, origin);
       }
 
-      if (user.password !== password) {
-        return sendJson(res, 401, { success: false, error: "Wrong password" }, origin);
+      const user = db.findUserByEmail(normalizedEmail);
+      if (!user) {
+        return sendJson(res, 401, { success: false, error: "Email or password is incorrect." }, origin);
+      }
+
+      if (user.password !== normalizedPassword) {
+        return sendJson(res, 401, { success: false, error: "Email or password is incorrect." }, origin);
       }
 
       const { password: _, ...userWithoutPassword } = user;
@@ -316,6 +323,251 @@ export const routes = {
     } catch (err) {
       return sendJson(res, 400, { success: false, error: err.message }, origin);
     }
+  },
+
+  // LIVE MARKET TICKER
+  "/api/market-ticker": async (req, res, origin) => {
+    if (req.method !== "GET") {
+      return sendJson(res, 405, { success: false, error: "Method not allowed" }, origin);
+    }
+
+    const symbols = [
+      { symbol: "^NSEI", name: "NIFTY 50" },
+      { symbol: "^BSESN", name: "SENSEX" },
+      { symbol: "^NSEBANK", name: "BANKNIFTY" },
+      { symbol: "RELIANCE.NS", name: "RELIANCE" },
+      { symbol: "TCS.NS", name: "TCS" },
+      { symbol: "INFY.NS", name: "INFOSYS" },
+      { symbol: "HDFCBANK.NS", name: "HDFC BANK" },
+      { symbol: "ICICIBANK.NS", name: "ICICI BANK" },
+      { symbol: "SBIN.NS", name: "SBI" },
+      { symbol: "ADANIENT.NS", name: "ADANI ENTERPRISES" },
+      { symbol: "ITC.NS", name: "ITC" },
+      { symbol: "BHARTIARTL.NS", name: "BHARTI AIRTEL" },
+      { symbol: "LT.NS", name: "LT" },
+      { symbol: "ASIANPAINT.NS", name: "ASIAN PAINTS" },
+      { symbol: "MARUTI.NS", name: "MARUTI" },
+      { symbol: "TATAMOTORS.NS", name: "TATA MOTORS" },
+      { symbol: "WIPRO.NS", name: "WIPRO" },
+      { symbol: "HCLTECH.NS", name: "HCL TECH" },
+      { symbol: "AXISBANK.NS", name: "AXIS BANK" },
+      { symbol: "BAJFINANCE.NS", name: "BAJAJ FINANCE" },
+      { symbol: "SUNPHARMA.NS", name: "SUN PHARMA" },
+    ];
+
+    try {
+      const ticker = await Promise.all(symbols.map(async (item) => {
+        try {
+          const response = await fetch(
+            `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(item.symbol)}?range=1d&interval=1m`,
+            {
+              headers: {
+                "User-Agent":
+                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                Accept: "application/json",
+              },
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error(`Unable to load ${item.name}`);
+          }
+
+          const data = await response.json();
+          const meta = data.chart?.result?.[0]?.meta || {};
+          const price = meta.regularMarketPrice ?? null;
+          const previousClose = meta.previousClose ?? meta.chartPreviousClose ?? null;
+          const change =
+            typeof price === "number" && typeof previousClose === "number"
+              ? price - previousClose
+              : null;
+          const changePercent =
+            typeof change === "number" && previousClose
+              ? (change / previousClose) * 100
+              : null;
+
+          return {
+            name: item.name,
+            symbol: item.symbol,
+            price,
+            change,
+            changePercent,
+          };
+        } catch {
+          return {
+            name: item.name,
+            symbol: item.symbol,
+            price: null,
+            change: null,
+            changePercent: null,
+          };
+        }
+      }));
+
+      return sendJson(
+        res,
+        200,
+        { success: true, ticker, updatedAt: new Date().toISOString() },
+        origin,
+      );
+    } catch (err) {
+      return sendJson(res, 502, { success: false, error: err.message }, origin);
+    }
+  },
+
+  // LIVE CATEGORY MARKET SNAPSHOT
+  "/api/market-category": async (req, res, origin) => {
+    if (req.method !== "GET") {
+      return sendJson(res, 405, { success: false, error: "Method not allowed" }, origin);
+    }
+
+    const urlParams = new URL(req.url, `http://${req.headers.host}`);
+    const category = urlParams.searchParams.get("category") || "delivery";
+    const categories = {
+      delivery: [
+        { symbol: "RELIANCE.NS", name: "Reliance Industries", detail: "Energy, retail, telecom" },
+        { symbol: "HDFCBANK.NS", name: "HDFC Bank", detail: "Private banking leader" },
+        { symbol: "TCS.NS", name: "TCS", detail: "Large-cap IT services" },
+        { symbol: "ICICIBANK.NS", name: "ICICI Bank", detail: "Retail and corporate banking" },
+        { symbol: "INFY.NS", name: "Infosys", detail: "IT consulting and digital" },
+        { symbol: "BHARTIARTL.NS", name: "Bharti Airtel", detail: "Telecom and digital services" },
+        { symbol: "LT.NS", name: "Larsen & Toubro", detail: "Infrastructure and engineering" },
+        { symbol: "ITC.NS", name: "ITC", detail: "FMCG, hotels, paperboards" },
+        { symbol: "SBIN.NS", name: "SBI", detail: "Public sector banking" },
+        { symbol: "HINDUNILVR.NS", name: "Hindustan Unilever", detail: "Consumer staples" },
+      ],
+      intraday: [
+        { symbol: "^NSEBANK", name: "Nifty Bank", detail: "High liquidity index basket" },
+        { symbol: "RELIANCE.NS", name: "Reliance Industries", detail: "Active large-cap volumes" },
+        { symbol: "HDFCBANK.NS", name: "HDFC Bank", detail: "Banking momentum trades" },
+        { symbol: "ICICIBANK.NS", name: "ICICI Bank", detail: "Frequent intraday swings" },
+        { symbol: "SBIN.NS", name: "SBI", detail: "High retail participation" },
+        { symbol: "TATAMOTORS.NS", name: "Tata Motors", detail: "Auto sector volatility" },
+        { symbol: "INFY.NS", name: "Infosys", detail: "IT sector liquidity" },
+        { symbol: "AXISBANK.NS", name: "Axis Bank", detail: "Banking breakout setups" },
+        { symbol: "ADANIENT.NS", name: "Adani Enterprises", detail: "Momentum-focused stock" },
+        { symbol: "BAJFINANCE.NS", name: "Bajaj Finance", detail: "Finance sector moves" },
+      ],
+      fo: [
+        { symbol: "^NSEI", name: "Nifty 50", detail: "Index futures and options" },
+        { symbol: "^NSEBANK", name: "Bank Nifty", detail: "Banking index derivatives" },
+        { symbol: "RELIANCE.NS", name: "Reliance Industries", detail: "Stock futures liquidity" },
+        { symbol: "HDFCBANK.NS", name: "HDFC Bank", detail: "Options-heavy counter" },
+        { symbol: "ICICIBANK.NS", name: "ICICI Bank", detail: "Active option chain" },
+        { symbol: "TATASTEEL.NS", name: "Tata Steel", detail: "Commodity-linked moves" },
+        { symbol: "TATAMOTORS.NS", name: "Tata Motors", detail: "Auto derivatives interest" },
+        { symbol: "INFY.NS", name: "Infosys", detail: "IT sector hedging" },
+        { symbol: "AXISBANK.NS", name: "Axis Bank", detail: "Banking F&O activity" },
+        { symbol: "BAJFINANCE.NS", name: "Bajaj Finance", detail: "Premium finance stock" },
+      ],
+      "mutual-fund": [
+        { symbol: "HDFCAMC.NS", name: "HDFC AMC", detail: "Listed asset management company" },
+        { symbol: "NAM-INDIA.NS", name: "Nippon India AMC", detail: "Retail-focused asset manager" },
+        { symbol: "ABSLAMC.NS", name: "Aditya Birla Sun Life AMC", detail: "Mutual fund asset manager" },
+        { symbol: "UTIAMC.NS", name: "UTI AMC", detail: "Legacy asset manager" },
+        { symbol: "MFSL.NS", name: "Max Financial", detail: "Financial services market proxy" },
+        { symbol: "SBILIFE.NS", name: "SBI Life", detail: "SBI group financial market proxy" },
+        { symbol: "ICICIPRULI.NS", name: "ICICI Prudential Life", detail: "ICICI group financial market proxy" },
+        { symbol: "KOTAKBANK.NS", name: "Kotak Bank", detail: "Kotak group financial market proxy" },
+      ],
+      banking: [
+        { symbol: "HDFCBANK.NS", name: "HDFC Bank", detail: "Private banking leader" },
+        { symbol: "ICICIBANK.NS", name: "ICICI Bank", detail: "Retail and corporate banking" },
+        { symbol: "SBIN.NS", name: "SBI", detail: "Public sector banking" },
+        { symbol: "AXISBANK.NS", name: "Axis Bank", detail: "Large private bank" },
+        { symbol: "KOTAKBANK.NS", name: "Kotak Bank", detail: "Private banking and wealth" },
+        { symbol: "INDUSINDBK.NS", name: "IndusInd Bank", detail: "Private sector banking" },
+        { symbol: "BANKBARODA.NS", name: "Bank of Baroda", detail: "Public sector banking" },
+        { symbol: "PNB.NS", name: "PNB", detail: "Public sector bank" },
+      ],
+      "it-sector": [
+        { symbol: "TCS.NS", name: "TCS", detail: "Large-cap IT services" },
+        { symbol: "INFY.NS", name: "Infosys", detail: "IT consulting and digital" },
+        { symbol: "HCLTECH.NS", name: "HCL Tech", detail: "Enterprise technology services" },
+        { symbol: "WIPRO.NS", name: "Wipro", detail: "IT services and consulting" },
+        { symbol: "TECHM.NS", name: "Tech Mahindra", detail: "Technology and telecom services" },
+        { symbol: "LTIM.NS", name: "LTIMindtree", detail: "Digital transformation services" },
+        { symbol: "PERSISTENT.NS", name: "Persistent", detail: "Software engineering services" },
+        { symbol: "MPHASIS.NS", name: "Mphasis", detail: "IT and cloud services" },
+      ],
+      auto: [
+        { symbol: "MARUTI.NS", name: "Maruti", detail: "Passenger vehicle leader" },
+        { symbol: "TATAMOTORS.NS", name: "Tata Motors", detail: "Auto and EV momentum" },
+        { symbol: "M&M.NS", name: "Mahindra & Mahindra", detail: "SUVs, tractors, and mobility" },
+        { symbol: "BAJAJ-AUTO.NS", name: "Bajaj Auto", detail: "Two-wheeler and export strength" },
+        { symbol: "EICHERMOT.NS", name: "Eicher Motors", detail: "Premium motorcycle segment" },
+        { symbol: "HEROMOTOCO.NS", name: "Hero MotoCorp", detail: "Two-wheeler manufacturer" },
+        { symbol: "TVSMOTOR.NS", name: "TVS Motor", detail: "Two and three-wheeler maker" },
+        { symbol: "ASHOKLEY.NS", name: "Ashok Leyland", detail: "Commercial vehicles" },
+      ],
+      pharma: [
+        { symbol: "SUNPHARMA.NS", name: "Sun Pharma", detail: "Large pharmaceutical company" },
+        { symbol: "DRREDDY.NS", name: "Dr Reddy's", detail: "Generic and specialty pharma" },
+        { symbol: "CIPLA.NS", name: "Cipla", detail: "Healthcare and respiratory focus" },
+        { symbol: "DIVISLAB.NS", name: "Divi's Labs", detail: "API and pharma ingredients" },
+        { symbol: "APOLLOHOSP.NS", name: "Apollo Hospitals", detail: "Healthcare services leader" },
+        { symbol: "LUPIN.NS", name: "Lupin", detail: "Global pharmaceutical company" },
+        { symbol: "AUROPHARMA.NS", name: "Aurobindo Pharma", detail: "Pharma manufacturing" },
+        { symbol: "ZYDUSLIFE.NS", name: "Zydus Life", detail: "Healthcare and pharma products" },
+      ],
+      bitcoin: [
+        { symbol: "BTC-USD", name: "Bitcoin", detail: "Largest crypto asset" },
+        { symbol: "ETH-USD", name: "Ethereum", detail: "Smart contract network" },
+        { symbol: "USDT-USD", name: "Tether", detail: "USD stablecoin liquidity" },
+        { symbol: "BNB-USD", name: "BNB", detail: "Exchange ecosystem token" },
+        { symbol: "SOL-USD", name: "Solana", detail: "High-throughput blockchain" },
+        { symbol: "XRP-USD", name: "XRP", detail: "Payments-focused token" },
+        { symbol: "USDC-USD", name: "USDC", detail: "Regulated stablecoin" },
+        { symbol: "DOGE-USD", name: "Dogecoin", detail: "High retail attention" },
+        { symbol: "ADA-USD", name: "Cardano", detail: "Proof-of-stake blockchain" },
+        { symbol: "AVAX-USD", name: "Avalanche", detail: "Layer-1 blockchain" },
+      ],
+    };
+
+    const symbols = categories[category];
+    if (!symbols) {
+      return sendJson(res, 400, { success: false, error: "Unknown market category" }, origin);
+    }
+
+    const ticker = await Promise.all(symbols.map(async (item) => {
+      try {
+        const response = await fetch(
+          `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(item.symbol)}?range=1d&interval=1m`,
+          {
+            headers: {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+              Accept: "application/json",
+            },
+          },
+        );
+
+        if (!response.ok) throw new Error("Quote unavailable");
+
+        const data = await response.json();
+        const meta = data.chart?.result?.[0]?.meta || {};
+        const price = meta.regularMarketPrice ?? null;
+        const previousClose = meta.previousClose ?? meta.chartPreviousClose ?? null;
+        const change =
+          typeof price === "number" && typeof previousClose === "number"
+            ? price - previousClose
+            : null;
+        const changePercent =
+          typeof change === "number" && previousClose
+            ? (change / previousClose) * 100
+            : null;
+
+        return { ...item, price, change, changePercent };
+      } catch {
+        return { ...item, price: null, change: null, changePercent: null };
+      }
+    }));
+
+    return sendJson(
+      res,
+      200,
+      { success: true, category, ticker, updatedAt: new Date().toISOString() },
+      origin,
+    );
   },
 
   // PRICING PLANS
