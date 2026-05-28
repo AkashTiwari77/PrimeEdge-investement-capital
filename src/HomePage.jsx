@@ -185,10 +185,7 @@ function HomePage() {
   const [loginEmail, setLoginEmail] = useState("");
 
   // Leave empty in development so Vite can proxy /api requests to the backend.
-  const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(
-    /\/$/,
-    "",
-  );
+  const API_BASE_URL = "https://primeedge-investement-capital.onrender.com";
   const apiUrl = (path) => `${API_BASE_URL}${path}`;
 
   const [loginPassword, setLoginPassword] = useState("");
@@ -499,7 +496,7 @@ function HomePage() {
 
     // ✅ AbortController for 15-second timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     try {
       const dbResponse = await fetch(apiUrl("/api/contact"), {
